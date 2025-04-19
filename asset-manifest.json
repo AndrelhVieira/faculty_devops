@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/faculty_devops/static/css/main.85e38799.css",
+    "main.js": "/faculty_devops/static/js/main.08283f5b.js",
+    "index.html": "/faculty_devops/index.html",
+    "main.85e38799.css.map": "/faculty_devops/static/css/main.85e38799.css.map",
+    "main.08283f5b.js.map": "/faculty_devops/static/js/main.08283f5b.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.85e38799.css",
+    "static/js/main.08283f5b.js"
+  ]
+}

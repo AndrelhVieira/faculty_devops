@@ -1,66 +1,89 @@
 import React from "react";
-import App from "./App";
 import { render, screen, fireEvent } from "@testing-library/react";
+import App from "./App";
 
-test("should renders the header", () => {
-  render(<App />);
-  screen.getByText(/Task Manager/i);
-});
+describe("Task Manager App", () => {
+  it("should render the title and main fields", () => {
+    render(<App />);
+    expect(screen.getByText("Task Manager")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Add a new task")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /add/i })).toBeInTheDocument();
+  });
 
-it("should renders the input field and add button", () => {
-  render(<App />);
+  it("should add a new task to the list", () => {
+    render(<App />);
 
-  screen.getByPlaceholderText(/Add a new task/i);
-  screen.getByText(/Add/i);
-});
+    const input = screen.getByPlaceholderText("Add a new task");
+    const addButton = screen.getByRole("button", { name: /add/i });
 
-it("should allows the user to add a task", () => {
-  render(<App />);
-  const inputElement = screen.getByPlaceholderText(/Add a new task/i);
-  const addButton = screen.getByText(/Add/i);
+    fireEvent.change(input, { target: { value: "Learn Testing" } });
+    fireEvent.click(addButton);
 
-  fireEvent.change(inputElement, { target: { value: "New Task" } });
-  fireEvent.click(addButton);
+    expect(screen.getByText("Learn Testing")).toBeInTheDocument();
+  });
 
-  const taskElement = screen.getByText(/New Task/i);
-  expect(taskElement).toBeInTheDocument();
-});
+  it("should not add an empty task", () => {
+    render(<App />);
 
-it("should clears the input field after adding a task", () => {
-  render(<App />);
-  const inputElement = screen.getByPlaceholderText(/Add a new task/i);
-  const addButton = screen.getByText(/Add/i);
+    const addButton = screen.getByRole("button", { name: /add/i });
+    fireEvent.click(addButton);
 
-  fireEvent.change(inputElement, { target: { value: "New Task" } });
-  fireEvent.click(addButton);
+    const listItems = screen.queryAllByRole("listitem");
+    expect(listItems.length).toBe(0);
+  });
 
-  expect(inputElement).toHaveValue("");
-});
+  it("should remove a task from the list", () => {
+    render(<App />);
 
-it("should does not add an empty task", () => {
-  render(<App />);
-  const addButton = screen.getByText(/Add/i);
+    const input = screen.getByPlaceholderText("Add a new task");
+    const addButton = screen.getByRole("button", { name: /add/i });
 
-  fireEvent.click(addButton);
+    fireEvent.change(input, { target: { value: "Task to delete" } });
+    fireEvent.click(addButton);
 
-  const taskList = screen.queryByRole("listitem");
-  expect(taskList).not.toBeInTheDocument();
-});
+    const deleteButton = screen.getByRole("button", { name: /delete/i });
+    fireEvent.click(deleteButton);
 
-it("should renders multiple tasks", () => {
-  render(<App />);
-  const inputElement = screen.getByPlaceholderText(/Add a new task/i);
-  const addButton = screen.getByText(/Add/i);
+    expect(screen.queryByText("Task to delete")).not.toBeInTheDocument();
+  });
 
-  fireEvent.change(inputElement, { target: { value: "Task 1" } });
-  fireEvent.click(addButton);
+  it("should add multiple tasks to the list", () => {
+    render(<App />);
 
-  fireEvent.change(inputElement, { target: { value: "Task 2" } });
-  fireEvent.click(addButton);
+    const input = screen.getByPlaceholderText("Add a new task");
+    const addButton = screen.getByRole("button", { name: /add/i });
 
-  const task1 = screen.getByText(/Task 1/i);
-  const task2 = screen.getByText(/Task 2/i);
+    fireEvent.change(input, { target: { value: "Task 1" } });
+    fireEvent.click(addButton);
 
-  expect(task1).toBeInTheDocument();
-  expect(task2).toBeInTheDocument();
+    fireEvent.change(input, { target: { value: "Task 2" } });
+    fireEvent.click(addButton);
+
+    expect(screen.getByText("Task 1")).toBeInTheDocument();
+    expect(screen.getByText("Task 2")).toBeInTheDocument();
+  });
+
+  it("should clear the input field after adding a task", () => {
+    render(<App />);
+
+    const input = screen.getByPlaceholderText("Add a new task");
+    const addButton = screen.getByRole("button", { name: /add/i });
+
+    fireEvent.change(input, { target: { value: "Task to clear" } });
+    fireEvent.click(addButton);
+
+    expect(input).toHaveValue("");
+  });
+
+  it("should clear the input field after adding a task (duplicate test)", () => {
+    render(<App />);
+
+    const input = screen.getByPlaceholderText("Add a new task");
+    const addButton = screen.getByRole("button", { name: /add/i });
+
+    fireEvent.change(input, { target: { value: "Task to clear" } });
+    fireEvent.click(addButton);
+
+    expect(input).toHaveValue("");
+  });
 });
